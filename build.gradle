@@ -1,0 +1,130 @@
+/**
+ * beehive app for java tool build file
+ * Init app
+ *
+ * @since 2016-02-15
+ * @author gust-zhang
+ */
+// build info
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://maven.eveoh.nl/content/repositories/releases"
+        }
+    }
+    dependencies {
+        classpath "nl.eveoh:gradle-aspectj:1.6"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.3.4.RELEASE"
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+// aop extends version
+project.ext {
+    aspectjVersion = "1.8.9"
+}
+
+// plugin
+apply plugin: "java"
+apply plugin: "idea"
+apply plugin: "spring-boot"
+apply plugin: "war"
+apply plugin: "checkstyle"
+apply plugin: "aspectj"
+
+// app base
+group "com.gustz.beehive"
+version "1.0"
+description = "beehive app for java tool"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+war { archiveName = "beehive.war" }
+
+// extends version
+ext {
+    springVer = "4.2.6.RELEASE"
+    springBootVer = "1.3.4.RELEASE"
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+}
+
+// ---------- task info ---------- begin
+task distribution << {
+    println "Build the zip with version=$version"
+}
+task release(dependsOn: "distribution") << {
+    println "This is release"
+}
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(release)) {
+        version = "1.0"
+    } else {
+        version = "${version}"
+    }
+}
+// ---------- task info ---------- end
+
+// check style
+checkstyle {
+    configFile = file("$rootDir/checkstyle.xml")
+    toolVersion = "6.5"
+    ignoreFailures = true
+    if (rootProject.hasProperty("checkstyle.ignoreFailures")) {
+        ignoreFailures = rootProject.properties["checkstyle.ignoreFailures"].toBoolean()
+    }
+}
+checkstyleMain {
+    source = fileTree(dir: "src/main", include: "**/*.java")
+}
+checkstyleTest {
+    source = fileTree(dir: "src/test", include: "**/*.java")
+}
+
+// jar
+dependencies {
+
+    // system ---------- begin
+    compile "org.codehaus.groovy:groovy-all:2.4.6"
+    compile "org.springframework.boot:spring-boot-starter-web:${springBootVer}"
+    providedCompile "javax.servlet:javax.servlet-api:3.1.0"
+    // system ---------- end
+
+    // test ---------- begin
+    testCompile "junit:junit:4.11"
+    testCompile "org.springframework:spring-test:${springVer}"
+    // test ---------- end
+
+    // spring ---------- begin
+    aspectpath "org.springframework:spring-aspects:${springVer}"
+    //
+    compile "org.springframework:spring-core:${springVer}"
+    compile "org.springframework:spring-web:${springVer}"
+    compile "org.springframework:spring-webmvc:${springVer}"
+    compile "org.springframework:spring-context:${springVer}"
+    compile "org.springframework:spring-context-support:${springVer}"
+    compile "org.springframework:spring-aop:${springVer}"
+    compile "org.springframework:spring-orm:${springVer}"
+    // spring ---------- end
+
+    // commons ---------- begin
+    compile "org.springframework.data:spring-data-redis:1.6.1.RELEASE"
+    compile "redis.clients:jedis:2.8.0"
+    compile "org.redisson:redisson:2.2.11"
+    compile "ch.qos.logback:logback-core:1.1.3"
+    compile "ch.qos.logback:logback-classic:1.1.3"
+    compile "com.googlecode.sli4j:sli4j-slf4j-logback:2.0"
+    compile "org.apache.commons:commons-lang3:3.4"
+    compile "javax.inject:javax.inject:1"
+    compile "commons-beanutils:commons-beanutils:1.9.2"
+    compile "com.google.code.gson:gson:2.6"
+    compile "commons-io:commons-io:2.5"
+    compile "org.aspectj:aspectjweaver:${aspectjVersion}"
+    //compile "com.github.lodsve:lodsve-dubbo:2.4.9"
+
+    // commons ---------- end
+
+}

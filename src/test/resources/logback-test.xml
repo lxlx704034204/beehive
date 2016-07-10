@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ###################################### -->
+<!-- LogBack logger configuration -->
+<!-- ###################################### -->
+<configuration scan="false" debug="false">
+    <property name="log_patt" value="%d{yyyy-MM-dd HH:mm:ss.SSSS} %-5level %logger{4} -%msg%n"/>
+
+    <!-- Local config begin -->
+    <appender name="console_log" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log_patt}</pattern>
+        </encoder>
+    </appender>
+    <!-- Local config end -->
+
+    <!-- root config -->
+    <root level="info">
+        <appender-ref ref="console_log"/>
+    </root>
+
+</configuration>

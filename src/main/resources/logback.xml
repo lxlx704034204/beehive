@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ###################################### -->
+<!-- LogBack logger configuration -->
+<!-- ###################################### -->
+<configuration scan="false" debug="false">
+
+    <!-- properties config -->
+    <property resource="conf/logback.properties"/>
+    <property name="log_max_history" value="360"/> <!-- 360day -->
+    <property name="log_patt" value="%d{yyyy-MM-dd HH:mm:ss.SSSS} [%thread] %-5level %logger{5} -%msg%n"/>
+
+    <!-- Local config begin -->
+    <!-- console log -->
+    <appender name="console_log" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${log_patt}</pattern>
+        </encoder>
+    </appender>
+    <!-- error log -->
+    <appender name="error_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${log_patt}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/error/%d{yyyy-MM,aux}/%d.log</fileNamePattern>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <!-- warn log -->
+    <appender name="warn_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${log_patt}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/warn/%d{yyyy-MM,aux}/%d.log</fileNamePattern>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <!-- info log -->
+    <appender name="info_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${log_patt}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_dir}/info/%d{yyyy-MM,aux}/%d.log</fileNamePattern>
+            <maxHistory>${log_max_history}</maxHistory>
+        </rollingPolicy>
+    </appender>
+    <!-- async log -->
+    <appender name="async_log" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <appender-ref ref="info_log"/>
+    </appender>
+    <!-- Local config end -->
+
+    <!-- thirdparty framework begin
+    <logger name="org.apache" level="ERROR"/>
+    <logger name="java.sql.PreparedStatement" level="ERROR"/>
+    <logger name="java.sql.Connection" level="ERROR"/>
+    <logger name="java.sql.Statement" level="ERROR"/>
+    -->
+    <logger name="org.springframework" level="INFO"/>
+    <!-- thirdparty framework end -->
+
+    <!-- root config -->
+    <root level="debug">
+        <!-- console -->
+        <appender-ref ref="console_log"/>
+
+        <!-- file -->
+        <appender-ref ref="error_log"/>
+        <appender-ref ref="warn_log"/>
+        <appender-ref ref="async_log"/>
+    </root>
+
+</configuration>
