@@ -43,7 +43,6 @@ public class BaseRemotePushTest extends BaseTest {
     public static void afterClass() throws IOException {
     }
 
-
     protected String getResponseOK(int msgid, int sendno) {
         JsonObject json = new JsonObject();
         json.add("msg_id", new JsonPrimitive(msgid));

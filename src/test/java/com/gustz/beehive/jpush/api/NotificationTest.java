@@ -88,8 +88,6 @@ public class NotificationTest extends BaseRemotePushTest {
         PushResult result = _client.sendPush(payload);
         Assert.assertTrue(result.isResultOK());
     }
-
-
     // ------------------ ios
 
     @Test
@@ -100,6 +98,10 @@ public class NotificationTest extends BaseRemotePushTest {
                 .setNotification(Notification.ios_auto_badge())
                 .build();
         PushResult result = _client.sendPush(payload);
+        System.out.println("**************");
+        System.out.println(result);
+        System.out.println(result.getResponseCode());
+        System.out.println("**************");
         Assert.assertTrue(result.isResultOK());
     }
 
@@ -109,12 +111,19 @@ public class NotificationTest extends BaseRemotePushTest {
         alert.add("title", new JsonPrimitive("Game Request"));
         alert.add("body", new JsonPrimitive("Bob wants to play poker"));
         alert.add("action-loc-key", new JsonPrimitive("PLAY"));
+        //
+        Audience audience = Audience.alias("1");
         PushPayload payload = PushPayload.newBuilder()
-                .setAudience(Audience.all())
+                .setAudience(audience)
                 .setPlatform(Platform.ios())
                 .setNotification(Notification.alert(alert.toString()))
                 .build();
+        // {"msg_id":1769052566,"sendno":1939247965}
         PushResult result = _client.sendPush(payload);
+        System.out.println("**************");
+        System.out.println(result);
+        System.out.println(result.getResponseCode());
+        System.out.println("**************");
         Assert.assertTrue(result.isResultOK());
     }
 

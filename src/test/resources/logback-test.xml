@@ -15,7 +15,7 @@
     <!-- Local config end -->
 
     <!-- root config -->
-    <root level="info">
+    <root level="DEBUG">
         <appender-ref ref="console_log"/>
     </root>
 
