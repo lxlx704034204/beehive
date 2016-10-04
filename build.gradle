@@ -124,6 +124,7 @@ dependencies {
     compile "commons-io:commons-io:2.5"
     compile "org.aspectj:aspectjweaver:${aspectjVersion}"
     compile "cn.jpush.api:jpush-client:3.2.10"
+    compile "commons-codec:commons-codec:1.9"
 
     // commons ---------- end
 
