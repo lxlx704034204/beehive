@@ -11,17 +11,17 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * Logger resolver for DAO audit log
+ * logger resolver for DAO audit log
  *
  * @author zhangzhenfeng
  * @since 2016-02-17
  */
 @Aspect
-//@Component
+@Component
 public class DaoLogResolver extends BaseLogResolver {
 
     @Pointcut(value = "@annotation(com.gustz.beehive.config.auditlog.DaoAuditLog)")
-    private void daoLogPct() {
+    private void sdkDaoLogPct() {
         // point cut method
     }
 
@@ -30,8 +30,8 @@ public class DaoLogResolver extends BaseLogResolver {
      *
      * @param jp
      */
-    @Before("daoLogPct()")
-    public void writeDaoAuditLog(JoinPoint jp) {
+    @Before("sdkDaoLogPct()")
+    private void writeDaoAuditLog(JoinPoint jp) {
         Method method = ((MethodSignature) jp.getSignature()).getMethod();
         if (method == null || !method.isAnnotationPresent(DaoAuditLog.class)) {
             return;
@@ -39,7 +39,7 @@ public class DaoLogResolver extends BaseLogResolver {
         DaoAuditLog daoAuditLog = method.getAnnotation(DaoAuditLog.class);
         AuditLogInfo logInfo = new AuditLogInfo();
         logInfo.setModule(daoAuditLog.module());
-        logInfo.setItem(daoAuditLog.item());
+        logInfo.setMetric(daoAuditLog.metric());
         this.writeBeforeLog(LogHelpers.stateless, logInfo, method.getParameters(), jp.getArgs());
     }
 

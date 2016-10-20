@@ -3,7 +3,7 @@ package com.gustz.beehive.config.auditlog;
 import java.lang.annotation.*;
 
 /*
- * Audit log config for client
+ * audit log config for client
  *
  * @author zhangzhenfeng
  * @since 2016-02-17
@@ -22,8 +22,8 @@ public @interface ClientAuditLog {
     String module();
 
     /**
-     * item name
+     * metric name
      */
-    String item();
+    String metric();
 }
 

@@ -2,8 +2,6 @@ package com.gustz.beehive.controller;
 
 import com.gustz.beehive.config.url.GetAccessUrl;
 import com.gustz.beehive.model.UserDto;
-import com.gustz.beehive.service.TestLogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +21,9 @@ import java.util.List;
 @RequestMapping("/test/*")
 public class TestController {
 
-    @Autowired
-    private TestLogService testLogService;
-
     @RequestMapping(value = "demo", method = RequestMethod.GET)
     public String demo() {
         System.out.println("demo...111");
-        testLogService.testLog2();
         return "ok";
     }
 
@@ -60,7 +54,6 @@ public class TestController {
             UserDto dto = new UserDto();
             dto.setId(1);
             //
-            testLogService.testLog(dto);
         } catch (Exception e) {
             System.err.println("demo4: exception");
         }

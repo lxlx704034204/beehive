@@ -4,18 +4,21 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:c="http://www.springframework.org/schema/c"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cache="http://www.springframework.org/schema/cache"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context 
-       http://www.springframework.org/schema/context/spring-context.xsd">
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/cache
+       http://www.springframework.org/schema/cache/spring-cache.xsd">
 
     <!-- redis pool configuration -->
     <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxWaitMillis" value="${redis.pool.maxWaitMillis}"/>
-        <property name="minIdle" value="${redis.pool.minIdle}"/>
-        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
-        <property name="maxTotal" value="${redis.pool.maxTotal}"/>
-        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <property name="maxWaitMillis" value="${redis.pool.max_wait_millis}"/>
+        <property name="minIdle" value="${redis.pool.min_idle}"/>
+        <property name="maxIdle" value="${redis.pool.max_idle}"/>
+        <property name="maxTotal" value="${redis.pool.max_total}"/>
+        <property name="testOnBorrow" value="${redis.pool.test_on_borrow}"/>
     </bean>
 
     <bean id="jedisConnectionFactory"
@@ -23,8 +26,7 @@
         <property name="hostName" value="${redis.host}"/>
         <property name="port" value="${redis.port}"/>
         <property name="password" value="${redis.password}"/>
-        <property name="usePool" value="true"/>
-        <property name="timeout" value="5000"/>
+        <property name="timeout" value="${redis.timeout}"/>
         <property name="poolConfig" ref="jedisPoolConfig"/>
     </bean>
 
@@ -37,5 +39,6 @@
     <bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
         <property name="connectionFactory" ref="jedisConnectionFactory"/>
     </bean>
+
 
 </beans>

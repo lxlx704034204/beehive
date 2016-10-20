@@ -1,9 +1,9 @@
 package com.gustz.beehive.config.auditlog.resolver;
 
-import com.google.gson.Gson;
 import com.gustz.beehive.config.auditlog.AuditLogArg;
 import com.gustz.beehive.config.auditlog.MaskType;
 import com.gustz.beehive.config.auditlog.MaskTypeLog;
+import com.gustz.beehive.util.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -11,16 +11,11 @@ import org.springframework.beans.BeanUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Logger resolver for base audit log
+ * logger resolver for base audit log
  *
  * @author zhangzhenfeng
  * @since 2016-02-17
@@ -29,42 +24,34 @@ public abstract class BaseLogResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseLogResolver.class);
 
-    private final Lock lock = new ReentrantLock();
-
-    private static final AtomicLong SEQ = new AtomicLong(0);
-
-    // hostname
-    private static String hostName;
-
-    static {
-        try {
-            hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            throw new Error(e);
-        }
-    }
-
     protected enum LogHelpers {
         stateless {
-
+            //@Override
+            //public AuditLogHelper getAuditLogHelper(AuditLogInfo auditLogInfo) {
+            //    return AuditLogHelper.getLogger(auditLogInfo.getModule());
+            //}
         }, session {
-
+            //@Override
+            //public AuditLogHelper getAuditLogHelper(AuditLogInfo auditLogInfo) {
+            //    return AuditLogHelper.getSessionLogger(auditLogInfo.getModule());
+            //}
         };
 
+        //public abstract AuditLogHelper getAuditLogHelper(AuditLogInfo auditLogInfo);
     }
 
     protected class AuditLogInfo {
 
         private String module;
 
-        private String item;
+        private String metric;
 
         public AuditLogInfo() {
         }
 
-        public AuditLogInfo(String module, String item) {
+        public AuditLogInfo(String module, String metric) {
             this.module = module;
-            this.item = item;
+            this.metric = metric;
         }
 
         public String getModule() {
@@ -75,17 +62,17 @@ public abstract class BaseLogResolver {
             this.module = module;
         }
 
-        public String getItem() {
-            return item;
+        public String getMetric() {
+            return metric;
         }
 
-        public void setItem(String item) {
-            this.item = item;
+        public void setMetric(String metric) {
+            this.metric = metric;
         }
     }
 
     /**
-     * Write before audit log
+     * write before audit log
      *
      * @param logHelpers
      * @param auditLogInfo
@@ -95,7 +82,6 @@ public abstract class BaseLogResolver {
     @SuppressWarnings("unchecked")
     protected void writeBeforeLog(LogHelpers logHelpers, AuditLogInfo auditLogInfo, Parameter[] parameters, final Object[] args) {
         try {
-            lock.lock();
             // get method annotation args
             if (args == null || args.length == 0 || args[0] == null || parameters == null) {
                 logger.debug("writeBeforeLog: args/parameters is null.");
@@ -120,9 +106,7 @@ public abstract class BaseLogResolver {
             // replace mask and write log
             //helper.log(auditLogInfo.getMetric(), this.getMaskLog(annoArgs));
         } catch (Throwable t) {
-            logger.error("writeBeforeLog: is fail.", t);
-        } finally {
-            lock.unlock();
+            logger.error("writeBeforeLog: catch t.msg={}", t.getMessage());
         }
     }
 
@@ -136,7 +120,6 @@ public abstract class BaseLogResolver {
     @SuppressWarnings("unchecked")
     protected void writeAfterLog(LogHelpers logHelpers, AuditLogInfo auditLogInfo, final Object args) {
         try {
-            lock.lock();
             // get method annotation args
             if (args == null) {
                 logger.debug("writeAfterLog: args is null.");
@@ -147,9 +130,7 @@ public abstract class BaseLogResolver {
             // replace mask and write log
             //helper.log(auditLogInfo.getMetric(), this.getMaskLog(Arrays.asList(args)));
         } catch (Throwable t) {
-            logger.error("writeAfterLog: is fail.", t);
-        } finally {
-            lock.unlock();
+            logger.error("writeAfterLog: catch t.msg={}", t.getMessage());
         }
     }
 
@@ -170,7 +151,7 @@ public abstract class BaseLogResolver {
                 targetArg = srcArg.getClass().newInstance();
                 BeanUtils.copyProperties(srcArg, targetArg);
             } catch (Exception e) {
-                logger.warn("getMaskLog: is fail.[ {} ]", e.getMessage());
+                logger.warn("getMaskLog: catch e.msg={}", e.getMessage());
                 continue;
             }
             final Class cls = targetArg.getClass();
@@ -204,7 +185,7 @@ public abstract class BaseLogResolver {
             }
             newAnnoArgs.add(targetArg);
         }
-        return new Gson().toJson(newAnnoArgs);
+        return JsonMapper.writeValueAsString(newAnnoArgs);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,46 +200,9 @@ public abstract class BaseLogResolver {
                 return cls.getDeclaredMethod(methodName, field.getType());
             }
         } catch (Exception e) {
-            logger.warn("getMethod: is fail.", e);
+            logger.warn("getMethod: catch e.msg={}", e.getMessage());
         }
         return null;
-    }
-
-    /**
-     * @param item the log's metric id. Its format is like 'WITH01', 'BCV01', etc.
-     * @param logs the log's contents. It MUST a json string.
-     */
-    private void log(String appId, String module, String item, String logs) {
-        if (item == null || logs == null) {
-            return;
-        }
-        StringBuffer sb = new StringBuffer("{");
-        sb.append(String.format("\"m_name\": \"%s\", ", item));
-        sb.append(String.format("\"m_host\": \"%s\", ", hostName));
-        sb.append(String.format("\"m_time\": %.3f, ", System.currentTimeMillis() / 1000.0));
-        sb.append(String.format("\"m_appid\": \"%s\", ", appId));
-        sb.append(String.format("\"m_module\": \"%s\", ", module));
-        sb.append(String.format("\"m_id\": \"%s\", ", getUniqId(appId)));
-        if (logs.startsWith("{")) {
-            // "{}"
-            if (logs.substring(1).trim().equals("}")) {
-                sb.append("\"value\": \"{}\"}");
-            } else {
-                sb.append(logs.substring(1));
-            }
-        } else if (logs.startsWith("[")) {
-            sb.append("\"value\": ");
-            sb.append(logs).append("}");
-        } else {
-            sb.append(String.format("\"value\": \"%s\"}", logs.replace("\"", "'")));
-        }
-
-        logger.info("{}", sb.toString());
-    }
-
-    private static String getUniqId(String appId) {
-        return String.format("%s-%x-", appId, System.currentTimeMillis()
-                - 45L * 365 * 24 * 3600 * 1000) + SEQ.getAndIncrement();
     }
 
 }

@@ -1,6 +1,5 @@
 package com.gustz.beehive.model;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -11,10 +10,8 @@ import java.io.Serializable;
  */
 public class UserDto implements Serializable {
 
-    @NotNull(message = "user.id.null")
     private Integer id;
 
-    @NotNull(message = "user.gid.null")
     private String gid;
 
     private String name;

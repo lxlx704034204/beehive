@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd 
+		   http://www.springframework.org/schema/context 
+		   http://www.springframework.org/schema/context/spring-context.xsd
+		   http://www.springframework.org/schema/util 
+		   http://www.springframework.org/schema/util/spring-util.xsd
+		   http://www.springframework.org/schema/tx 
+		   http://www.springframework.org/schema/tx/spring-tx.xsd
+		   http://www.springframework.org/schema/aop 
+		   http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- datasource -->
+    <bean id="beehiveDs" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="${jdbc.beehive.url}"/>
+        <property name="username" value="${jdbc.beehive.username}"/>
+        <property name="password" value="${jdbc.beehive.password}"/>
+        <property name="maximumPoolSize" value="${jdbc.beehive.max_pool_size}"/>
+    </bean>
+
+    <!-- transaction manager -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="beehiveDs"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" mode="aspectj"/>
+
+    <!-- mybatis factory -->
+    <bean id="beehiveSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="beehiveDs"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+        <property name="mapperLocations" value="classpath*:mapper/**/*.xml"/>
+    </bean>
+
+    <!-- scan mappers under the dao dir -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="whaleSqlSessionFactory"/>
+        <property name="basePackage" value="com.gustz.beehive.dao.mapper"/>
+    </bean>
+
+</beans>

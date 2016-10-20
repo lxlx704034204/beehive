@@ -1,6 +1,5 @@
 package com.gustz.beehive.util;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import javax.crypto.Cipher;
@@ -12,6 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -45,7 +45,7 @@ public final class SecureCipherHelper {
             byteGroup.addBytes(padBytes);
             //
             byte[] encrypted = cipher.doFinal(byteGroup.toBytes());
-            return Base64.encodeBase64String(encrypted);
+            return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
             throw new IllegalStateException("failed to encrypt the secure field,e.msg=" + e.getMessage());
         }
@@ -55,7 +55,7 @@ public final class SecureCipherHelper {
         try {
             init(cipher, Cipher.DECRYPT_MODE, encKey);
             //
-            byte[] decrypted = cipher.doFinal(Base64.decodeBase64(encryptData));
+            byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptData));
             // clear padding char
             decrypted = PKCS7Encoder.decode(decrypted);
             return new String(decrypted, CHARSET);
@@ -65,7 +65,7 @@ public final class SecureCipherHelper {
     }
 
     private static void init(Cipher cipher, int mode, String encKey) throws InvalidAlgorithmParameterException, InvalidKeyException {
-        final byte[] aesKey = Base64.decodeBase64(encKey);
+        final byte[] aesKey = Base64.getDecoder().decode(encKey);
         IvParameterSpec iv = new IvParameterSpec(aesKey);
         SecretKeySpec secretKeySpec = new SecretKeySpec(aesKey, "AES");
         cipher.init(mode, secretKeySpec, iv);
@@ -102,7 +102,7 @@ public final class SecureCipherHelper {
         B64 {
             @Override
             public String toString(byte[] bs) {
-                return Base64.encodeBase64String(bs);
+                return Base64.getEncoder().encodeToString(bs);
             }
         }, HEX {
             @Override
@@ -155,7 +155,7 @@ public final class SecureCipherHelper {
         }
     }
 
-    private static class ByteGroup {
+    public static class ByteGroup {
 
         private final List<Byte> byteContainer = new ArrayList<Byte>();
 

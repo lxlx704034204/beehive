@@ -1,13 +1,13 @@
 package com.gustz.beehive.config.auditlog;
 
 /*
- * Mask type enum　
+ * mask type enum　
  *
  * <p>
  * <pre>
- * 身份证号: 171232********328X <br/>
- * 手机号: 139****8678 <br/>
- * 银行卡号: 6225****5736 <br/>
+ * id card: 171232********328X <br/>
+ * mobile: 139****8678 <br/>
+ * bankcard: 6225****5736 <br/>
  * cvn2: **5 <br/>
  * </pre>
  *
@@ -71,6 +71,28 @@ public enum MaskType {
                 return str;
             }
             return "**" + str.substring(str.length() - 1, str.length());
+        }
+    }, ALLSecret {
+        /**
+         * Get CVN2 mask
+         *
+         * @param str
+         * @return
+         */
+        @Override
+        public String getMaskText(String str) {
+            return "**************";
+        }
+    }, Cvn2Blank {
+        /**
+         * Get CVN2 mask
+         *
+         * @param str
+         * @return
+         */
+        @Override
+        public String getMaskText(String str) {
+            return "";
         }
     };
 

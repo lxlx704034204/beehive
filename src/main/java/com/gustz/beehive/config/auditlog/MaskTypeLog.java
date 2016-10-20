@@ -3,7 +3,7 @@ package com.gustz.beehive.config.auditlog;
 import java.lang.annotation.*;
 
 /*
- * Mask type log config
+ * mask type log config
  *
  * @author zhangzhenfeng
  * @since 2016-02-17

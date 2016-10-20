@@ -1,15 +1,11 @@
 package com.gustz.beehive.util;
 
 import com.google.gson.Gson;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Bean util test

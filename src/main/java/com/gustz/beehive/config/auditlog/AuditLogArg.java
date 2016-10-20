@@ -3,7 +3,7 @@ package com.gustz.beehive.config.auditlog;
 import java.lang.annotation.*;
 
 /*
- * Audit log arg config
+ * audit log arg config
  *
  * @author zhangzhenfeng
  * @since 2016-02-17

@@ -11,17 +11,17 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * Logger resolver for client audit log
+ * logger resolver for client audit log
  *
  * @author zhangzhenfeng
  * @since 2016-02-17
  */
 @Aspect
-//@Component
+@Component
 public class ClientLogResolver extends BaseLogResolver {
 
     @Pointcut(value = "@annotation(com.gustz.beehive.config.auditlog.ClientAuditLog)")
-    private void clientLogPct() {
+    private void sdkClientLogPct() {
         // point cut method
     }
 
@@ -31,8 +31,8 @@ public class ClientLogResolver extends BaseLogResolver {
      * @param jp
      * @throws Throwable
      */
-    @Around("clientLogPct()")
-    public Object writeClientAuditLog(ProceedingJoinPoint jp) throws Throwable {
+    @Around("sdkClientLogPct()")
+    private Object writeClientAuditLog(ProceedingJoinPoint jp) throws Throwable {
         Method method = ((MethodSignature) jp.getSignature()).getMethod();
         if (method == null || !method.isAnnotationPresent(ClientAuditLog.class)) {
             return jp.proceed();
@@ -40,7 +40,7 @@ public class ClientLogResolver extends BaseLogResolver {
         final ClientAuditLog clientAuditLog = method.getAnnotation(ClientAuditLog.class);
         final AuditLogInfo logInfo = new AuditLogInfo();
         logInfo.setModule(clientAuditLog.module());
-        logInfo.setItem(clientAuditLog.item());
+        logInfo.setMetric(clientAuditLog.metric());
         // s1: before log
         this.writeBeforeLog(LogHelpers.session, logInfo, method.getParameters(), jp.getArgs());
         // s2: return log
