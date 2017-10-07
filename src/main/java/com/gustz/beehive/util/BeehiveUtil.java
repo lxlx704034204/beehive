@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * XXX
+ * util
  *
  * @author zhangzhenfeng
  * @since 2016-10-20
@@ -18,7 +18,11 @@ public abstract class BeehiveUtil {
     }
 
     public static String generateUUID() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+        return UUID.randomUUID().toString();
+    }
+
+    public static String generateSpUUID() {
+        return generateUUID().replaceAll("-", "");
     }
 
     static String fmtYmd() {
